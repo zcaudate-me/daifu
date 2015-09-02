@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <meta name="google" value="notranslate">
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+
+    <title>daifu</title>
+
+    
+  <link href='http://fonts.googleapis.com/css?family=Raleway:300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/languages/clojure.min.js"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/magula.min.css">
+
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular-cookies.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js"></script>
+  <script type="text/javascript" src="js/angular-highlightjs.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="css/rdash.min.css">
+  <link rel="stylesheet" type="text/css" href="css/scrollspy.css">
+
+
+  <script>
+    window.console = window.console || function(t) {};
+    window.open = function(){ console.log("window.open is disabled."); };
+    window.print   = function(){ console.log("window.print is disabled."); };
+  </script>
+
+  <script>
+    var app = angular.module('app', ['hljs']);
+  </script>
+  </head>
+
+  <body ng-app="app" data-spy="scroll" data-target=".scrollspy">
+  <!-- Fixed navbar -->
+    <nav class="navbar navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html"><img src="img/logo-white.png"></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="https://github.com/helpshift/daifu" target="_blank">Github</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+
+  <div class="container row">
+    <div class="col-md-4 scrollspy pull-right">
+      <ul id="nav" class="nav hidden-xs hidden-sm" data-spy="affix">
+        <li><a href="#introduction">1  &nbsp;&nbsp; Introduction</a><ul class="nav"><li><a href="#installation">1.1  &nbsp;&nbsp; Installation</a></li></ul></li><li><a href="#usage">2  &nbsp;&nbsp; Usage</a><ul class="nav"><li><a href="#in-repl">2.1  &nbsp;&nbsp; In Repl</a></li><li><a href="#leiningen">2.2  &nbsp;&nbsp; Leiningen</a></li></ul></li><li><a href="#indicators">3  &nbsp;&nbsp; Indicators</a><ul class="nav"><li><a href="#idiom-indicator">3.1  &nbsp;&nbsp; idiom indicator</a></li><li><a href="#project-indicator">3.2  &nbsp;&nbsp; project indicator</a></li><li><a href="#file-indicator">3.3  &nbsp;&nbsp; file indicator</a></li><li><a href="#function-indicator">3.4  &nbsp;&nbsp; function indicator</a></li></ul></li><li><a href="#jurisdictions">4  &nbsp;&nbsp; Jurisdictions</a><ul class="nav"><li><a href="#file">4.1  &nbsp;&nbsp; file</a></li><li><a href="#multi">4.2  &nbsp;&nbsp; multi</a></li><li><a href="#project">4.3  &nbsp;&nbsp; project</a></li></ul></li><li><a href="#diagnosis">5  &nbsp;&nbsp; Diagnosis</a></li><li><a href="#presentation">6  &nbsp;&nbsp; Presentation</a></li><li><a href="#specification">7  &nbsp;&nbsp; Specification</a><ul class="nav"><li><a href="#project-meta-indicator">7.1  &nbsp;&nbsp; project-meta indicator</a></li><li><a href="#project-dependencies-indicator">7.2  &nbsp;&nbsp; project-dependencies indicator</a></li><li><a href="#project-newest-indicator">7.3  &nbsp;&nbsp; project-newest indicator</a></li><li><a href="#ns-indicator">7.4  &nbsp;&nbsp; ns indicator</a></li><li><a href="#docstring-indicator">7.5  &nbsp;&nbsp; docstring indicator</a></li></ul></li>
+      </ul>
+    </div>
+    <div class="col-md-8" id="content">
+      <div class="jumbotron">
+        <div class="container">
+          <h1>daifu</h1>
+          <h4>checkups for your code</h4>
+        </div>
+      </div>
+      <section class="chapter" id="introduction"><h2 class="chapter">1  &nbsp;&nbsp; Introduction</h2><div class="group"><div class="paragraph"><p><a href='https://www.github.com/helpshift/daifu'>daifu</a> is a tool for checking code quality that integrates into the code review process. Regular code reviews have the following effect in the order of increasing importance:</p><ol><li>Maintaining consistency of quality and idiomatic style</li><li>Knowledge transfer and increased team awareness</li><li>Finding alternative solutions and problem solving</li></ol><p>If part of the code review process can be automated through a tool that can check for consistency of quality and idiomatic style, then the more important aspects of the process can be put into focus. Furthermore, by using a combination of statistics as well as looking at key indicators of code over time, we can determine, the healthiness of our codebase.</p><p>If we can provide metrics and views on how a system is performing over time, then it will be in our best interest to make it better and better. The origin of the name 大<em>(dai)</em> 夫<em>(fu)</em> is chinese and means 'doctor'.</p></div></div><section class="section" id="installation"><h3 class="section">1.1  &nbsp;&nbsp; Installation</h3><div class="paragraph"><p>In your <code>project.clj</code>, add <a href='https://www.github.com/helpshift/daifu'>daifu</a> to the <code>&#91;:profiles :dev :dependencies&#93;</code> entry:</p><pre><code class="clojure">&#40;defproject ...
+    ...
+    :profiles {:dev {:dependencies &#91;...
+                                    &#91;helpshift/daifu &quot;0.1.0-SNAPSHOT&quot;&#93;
+                                    ...&#93;}}
+    ...&#41;
+</code></pre></div><div class="paragraph"><p>All functionality is the <code>daifu.core</code> namespace:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(use 'daifu.core)</div></div></section></section><section class="chapter" id="usage"><h2 class="chapter">2  &nbsp;&nbsp; Usage</h2><section class="section" id="in-repl"><h3 class="section">2.1  &nbsp;&nbsp; In Repl</h3><div class="paragraph"><p>The following shows the usage of daifu for a particular project</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(use 'daifu.core)</div></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(-&gt; (visitation &quot;path/to/project.clj&quot;
+                {:indicators    [&quot;qa/indicators&quot;] ; name of a folder
+                 :jurisdictions [&quot;qa/jurisdictions&quot;] ; name of a folder&quot;
+                 ;;:run :everything
+                 :defaults {:multi   :multi-example
+                            :single  :hello-example}})
+
+    (diagnosis [:project-meta]
+               [:project-dependencies]
+               [:project-newest]
+               [:arithmetic-forms :hello-example]
+               [:arithmetic-forms :world-example]
+               [:equality-forms   :hello-example]
+               [:equality-forms   :multi-example])
+    
+    (presentation {:format :html}))</div></div></section><section class="section" id="leiningen"><h3 class="section">2.2  &nbsp;&nbsp; Leiningen</h3><div class="paragraph"><p><a href='https://www.github.com/helpshift/daifu'>daifu</a> will also be avaliable as a leiningen plugin.</p></div><div class="code"><div hljs="hljs" language="shell" no-escape="no-escape">
+% lein daifu -i qa/indicators -j qa/jurisdictions 
+             -d qa/diagnostic.edn -f json -o out.json</div></div><div class="paragraph"><p>Will output in <code>out.json</code> something similar to:</p></div><div class="code"><div hljs="hljs" language="javascript" no-escape="no-escape">
+{&quot;created&quot;: &quot;Tue Sep 01 2015 15:15:30 GMT+0530 (IST)&quot;
+ &quot;diagnosis&quot;: [{&quot;name&quot;: &quot;project-meta&quot;
+                &quot;realm&quot;: &quot;default&quot;
+                &quot;output&quot;: { ... }}]}</div></div></section></section><section class="chapter" id="indicators"><h2 class="chapter">3  &nbsp;&nbsp; Indicators</h2><div class="group"><div class="paragraph"><p>Indicators are created via the following calls:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">{:name :&lt;INDICATOR&gt;
+ :type #{:idiom :file :project}
+
+ ... indicator type dependent characteristics ...}</div></div></div><section class="section" id="idiom-indicator"><h3 class="section">3.1  &nbsp;&nbsp; idiom indicator</h3><div class="paragraph"><p><code>:idiom</code> indicators are defined as follows:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :arithmatic-forms
+           :type  :idiom
+           :rules [[(+ ?x 1) (inc ?x)]
+                   [(+ 1 ?x) (inc ?x)]
+                   [(- ?x 1) (dec ?x)]
+                   
+                   [(* ?x (* . ?xs)) (* ?x . ?xs)]
+                   [(+ ?x (+ . ?xs)) (+ ?x . ?xs)]
+
+                   ;;trivial identites
+                   [(+ ?x 0) ?x]
+                   [(- ?x 0) ?x]
+                   [(* ?x 1) ?x]
+                   [(/ ?x 1) ?x]
+                   [(* ?x 0) 0]
+                   
+                   ;;Math/hypot
+                   [(Math/sqrt (+ (Math/pow ?x 2)
+                                  (Math/pow ?y 2)))
+                    (Math/hypot ?x ?y)]
+                   
+                   ;;Math/expm1
+                   [(dec (Math/exp ?x))
+                    (Math/expm1 ?x)]
+
+                   ;;ugly rounding tricks
+                   [(long (+ ?x 0.5))
+                    (Math/round ?x)]]})</div></div></section><section class="section" id="project-indicator"><h3 class="section">3.2  &nbsp;&nbsp; project indicator</h3><div class="paragraph"><p><code>:project</code> indicators are defined as follows:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :wrong-arity
+           :level 3
+           :group :syntax
+           :type  :project
+           :dependencies [[jonase/eastwood &quot;0.2.1&quot;]]
+           :injections [(require [eastwood.lint :as e])]
+           :main (fn [project]
+                   (e/lint {:source-paths [&quot;src&quot;] :test-paths [&quot;test&quot;]}))})</div></div></section><section class="section" id="file-indicator"><h3 class="section">3.3  &nbsp;&nbsp; file indicator</h3><div class="paragraph"><p><code>:file</code> indicators are defined as follows:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :word-count
+           :type  :file
+           :dependencies []
+           :injections []
+           :main (fn [file]
+                   ....)})</div></div></section><section class="section" id="function-indicator"><h3 class="section">3.4  &nbsp;&nbsp; function indicator</h3><div class="paragraph"><p><code>:function</code> indicators are defined as follows:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :has-docstring-check
+           :type  :function
+           :dependencies []
+           :injections []
+           :main (fn [zloc]
+                   ....)})</div></div></section></section><section class="chapter" id="jurisdictions"><h2 class="chapter">4  &nbsp;&nbsp; Jurisdictions</h2><div class="group"><div class="paragraph"><p>Jurisdictions are domains which indicators are active. Sometimes, we want to get information about a single file, whilst other times we want information about all the files within the project, or some aspect of the project itself.</p></div></div><section class="section" id="file"><h3 class="section">4.1  &nbsp;&nbsp; file</h3><div class="paragraph"><p><code>:file</code> jurisdictions allow the specification of a single path to a file</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +jurisdictions+
+          {:name  :hello-example
+           :type  :file
+           :path  &quot;src/hello/example.clj&quot;})</div></div></section><section class="section" id="multi"><h3 class="section">4.2  &nbsp;&nbsp; multi</h3><div class="paragraph"><p><code>:multi</code> jurisdictions allow the specification of a set of files as well as a set of patterns</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +jurisdictions+
+          {:name  :multi-example
+           :type  :multi
+           :files [&quot;src/hello/example.clj&quot;
+                   &quot;src/hello/world.clj&quot;]})</div></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +jurisdictions+
+          {:name  :pattern-example
+           :type  :multi
+           :patterns [#&quot;src/hello&quot;]})</div></div></section><section class="section" id="project"><h3 class="section">4.3  &nbsp;&nbsp; project</h3><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +jurisdictions+
+          {:name  :hello-project
+           :type  :project
+           :exclude {:src-files  []
+                     :test-files []}})</div></div></section></section><section class="chapter" id="diagnosis"><h2 class="chapter">5  &nbsp;&nbsp; Diagnosis</h2><div class="group"><div class="paragraph"><p>The <code>diagnosis</code> function allows for a set of indicator/jurisdiction pairs to be specified.</p></div></div></section><section class="chapter" id="presentation"><h2 class="chapter">6  &nbsp;&nbsp; Presentation</h2><div class="group"><div class="paragraph"><p>The <code>presentation</code> function allows for statistics to be generated in json/html for consumption by other devices.</p></div></div></section><section class="chapter" id="specification"><h2 class="chapter">7  &nbsp;&nbsp; Specification</h2><div class="group"><div class="paragraph"><p>Lets first define a <code>project.clj</code> template:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(defproject temp &quot;0.1.0-SNAPSHOT&quot;
+  :description &quot;FIXME: write description&quot;
+  :url &quot;http://example.com/FIXME&quot;
+  :license {:name &quot;Eclipse Public License&quot;
+            :url &quot;http://www.eclipse.org/legal/epl-v10.html&quot;}
+  :dependencies [[org.clojure/clojure &quot;1.6.0&quot;]
+                 [org.clojure/test.check &quot;0.5.8&quot;]
+                 [criterium &quot;0.4.2&quot;]]
+  :profiles {:dev {:dependencies [[midje &quot;1.6.0&quot;]]}})</div></div></div><section class="section" id="project-meta-indicator"><h3 class="section">7.1  &nbsp;&nbsp; project-meta indicator</h3><div class="paragraph"><p>The project-meta indicator will look at related project metadata</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :project-meta
+           :type  :project
+           :dependencies []
+           :injections []
+           :main (fn [project]
+                   ....)})
+
+(-&gt; (visitation &quot;path/to/project.clj&quot;)      
+    (diagnosis [:project-meta :default-project]))
+
+=&gt; {:diagnosis [{:indicator :project-meta
+                 :jurisdiction :default-project
+                 :stat 2
+                 :results [{:file &quot;project.clj&quot;
+                            :line 2
+                            :msg &quot;please add proper description&quot;}
+                           {:file &quot;project.clj&quot;
+                            :line 3
+                            :msg &quot;please add proper url&quot;}]}]}</div></div></section><section class="section" id="project-dependencies-indicator"><h3 class="section">7.2  &nbsp;&nbsp; project-dependencies indicator</h3><div class="paragraph"><p>The project-meta indicator will look at resolving project dependencies:</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :project-dependencies
+           :type  :project
+           :dependencies []
+           :injections []
+           :main (fn [project]
+                   ....)})
+
+(-&gt; (visitation &quot;path/to/project.clj&quot;)      
+    (diagnosis [:project-dependencies :default-project]))
+
+=&gt; {:diagnosis [{:indicator :project-dependencies
+                 :jurisdiction :default-project
+                 :stat 1
+                 :results [{:file &quot;project.clj&quot;
+                            :line 7
+                            :msg &quot;org.clojure/test.check is only used inside test directory. Move it to dev dependencies instead&quot;}]}]}</div></div></section><section class="section" id="project-newest-indicator"><h3 class="section">7.3  &nbsp;&nbsp; project-newest indicator</h3><div class="paragraph"><p>The project-newest indicator will look at getting the newest project.</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :project-newest
+           :type  :project
+           :dependencies []
+           :injections []
+           :main (fn [project]
+                   ....)})
+
+(-&gt; (visitation &quot;path/to/project.clj&quot;)      
+    (diagnosis [:project-newest :default-project]))
+
+=&gt; {:diagnosis [{:indicator :project-newest
+                 :jurisdiction :default-project
+                 :stat 1
+                 :results [{:file &quot;project.clj&quot;
+                            :line 8
+                            :msg &quot;criterium can be upgraded to version 0.4.3&quot;}]}]}</div></div></section><section class="section" id="ns-indicator"><h3 class="section">7.4  &nbsp;&nbsp; ns indicator</h3><div class="paragraph"><p>This indicator looks at the namespace form for each file and catches:</p><ul><li>bad usages of <code>:refer</code>, i.e <code>:refer :all</code> is not allowed.</li><li>removal of direct references</li><li>removal of unsued libraries</li><li>warning for instances of <code>:use</code></li></ul></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :ns-indicator
+           :type  :file
+           :dependencies [[slamhound &quot;1.5.5&quot;]]
+           :injections [(use 'slam.hound)]
+           :main (fn [file]
+                   ....)})
+
+(-&gt; (visitation &quot;path/to/project.clj&quot;)      
+    (diagnosis [:ns-indicator :default-project]))
+
+=&gt; {:diagnosis [{:indicator :ns-indicator
+                 :jurisdiction :default-project
+                 :results [{:file &quot;src/hello/example.clj&quot;
+                           :stat 2
+                           :results {}}
+                          {:file &quot;src/world/example.clj&quot;
+                           :stat 0
+                           :results {}}
+                          {:file &quot;src/again/example.clj&quot;
+                           :stat 0
+                           :results {}}]}]}</div></div></section><section class="section" id="docstring-indicator"><h3 class="section">7.5  &nbsp;&nbsp; docstring indicator</h3><div class="paragraph"><p>This indicator looks for a docstring</p></div><div class="code"><div hljs="hljs" language="clojure" no-escape="no-escape">(add-item +indicators+
+          {:name  :docstring-indicator
+           :type  :function
+           :dependencies []
+           :injections []
+           :main (fn [zloc]
+                   ...)})
+
+(-&gt; (visitation &quot;path/to/project.clj&quot;)      
+    (diagnosis [:docstring-indicator :hello-example]))
+
+=&gt; {:extra {:timestamp &lt;&gt;}
+    :diagnosis [{:indicator :docstring-indicator
+                 :jurisdiction :hello-example
+                 :results [{:file &quot;src/hello/example.clj&quot;
+                            :namespace hello.example
+                            :results [{:function add-n
+                                       :stat true
+                                       :summary {:line 3}}
+                                      {:function minus-n
+                                       :stat false
+                                       :summary {:line 5}}]}]}]}</div></div></section></section>
+    </div>
+</div><!--end of .container-->
+
+</body>
+
+<script>
+  $('#nav').affix({
+    offset: {
+        top: $('#nav').offset().top,
+        bottom: $('footer').outerHeight(true) + $('.application').outerHeight(true) + 40
+    }});
+</script>
+
+
+<script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+</body>
+</html>
