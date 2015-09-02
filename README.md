@@ -2,7 +2,7 @@
 
 checkups for your code
 
-![daifu logo](https://raw.githubusercontent.com/helpshift/hydrox/master/template/assets/img/daifu.png)
+![daifu logo](https://raw.githubusercontent.com/zcaudate/daifu/master/template/assets/img/daifu.png)
 
 ## License
 
