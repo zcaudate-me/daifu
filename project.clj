@@ -5,7 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]]
   :profiles {:dev {:dependencies [[midje "1.7.0"]
-                                  [helpshift/hydrox "0.1.3"]]
+                                  ;;[helpshift/hydrox "0.1.3"]
+                                  ]
                    :plugins [[lein-midje "3.1.3"]]}}
   :documentation {:site  "daifu"
                  :output "docs"
