@@ -1,0 +1,17 @@
+{:name  :sequence
+ :type  :idiom
+ :rules  [;; mapcat
+          [(apply concat (apply map ?x ?y)) (mapcat ?x ?y)]
+          [(apply concat (map ?x . ?y)) (mapcat ?x . ?y)]
+
+          ;; filter
+          [(filter (complement ?pred) ?coll) (remove ?pred ?coll)]
+          [(filter seq ?coll) (remove empty? ?coll)]
+          [(filter (fn* [?x] (not (?pred ?x))) ?coll) (remove ?pred ?coll)]
+          [(filter (fn [?x] (not (?pred ?x))) ?coll) (remove ?pred ?coll)]
+
+          ;; first/next shorthands
+          [(first (first ?coll)) (ffirst ?coll)]
+          [(first (next ?coll))  (fnext ?coll)]
+          [(next (next ?coll))   (nnext ?coll)]
+          [(next (first ?coll))  (nfirst ?coll)]]}

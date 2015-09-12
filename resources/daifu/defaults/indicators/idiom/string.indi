@@ -1,0 +1,6 @@
+{:name  :string
+ :type  :idiom
+ :rules  [[(.toString ?x) (str ?x)]
+          [(apply str (interpose ?x ?y)) (clojure.string/join ?x ?y)]
+          [(apply str (reverse ?x)) (clojure.string/reverse ?x)]
+          [(apply str ?x) (clojure.string/join ?x)]]}
