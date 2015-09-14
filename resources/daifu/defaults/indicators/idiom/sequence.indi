@@ -1,5 +1,5 @@
-{:id  :sequence
- :type  :idiom
+{:id     :sequence
+ :type   :idiom
  :rules  [;; mapcat
           [(apply concat (apply map ?x ?y)) (mapcat ?x ?y)]
           [(apply concat (map ?x . ?y)) (mapcat ?x . ?y)]

@@ -5,6 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/tools.cli "0.3.3"]
+                 [im.chit/hara.namespace.eval "2.2.11"]
                  [jonase/kibit "0.1.2"]
                  [im.chit/gita "0.2.0"]]
   :profiles {:dev {:dependencies [[midje "1.7.0"]

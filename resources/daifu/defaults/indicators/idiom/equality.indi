@@ -1,4 +1,4 @@
-{:id  :equality
+{:id    :equality
  :type  :idiom
  :rules  [;; not=
           [(not (= . ?args)) (not= . ?args)]

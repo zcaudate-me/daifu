@@ -1,5 +1,5 @@
-{:id  :collection
- :type  :idiom
+{:id     :collection
+ :type   :idiom
  :rules  [;;vector
           [(conj [] . ?x) (vector . ?x)]
           [(into [] ?coll) (vec ?coll)]
