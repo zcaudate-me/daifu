@@ -1,4 +1,4 @@
-{:name  :string
+{:id  :string
  :type  :idiom
  :rules  [[(.toString ?x) (str ?x)]
           [(apply str (interpose ?x ?y)) (clojure.string/join ?x ?y)]

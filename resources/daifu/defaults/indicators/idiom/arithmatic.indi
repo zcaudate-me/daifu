@@ -1,4 +1,4 @@
-{:name  :arithmatic
+{:id  :arithmatic
  :type  :idiom
  :rules [[(+ ?x 1) (inc ?x)]
          [(+ 1 ?x) (inc ?x)]

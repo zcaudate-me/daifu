@@ -85,7 +85,7 @@ If we can provide metrics and views on how a system is performing over time, the
 "Indicators are created via the following calls:"
 
 (comment
-  {:name :<INDICATOR>
+  {:id :<INDICATOR>
    :type #{:idiom :file :project}
 
    ... indicator type dependent characteristics ...})
@@ -97,7 +97,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :arithmatic-forms
+            {:id  :arithmatic-forms
              :type  :idiom
              :rules [[(+ ?x 1) (inc ?x)]
                      [(+ 1 ?x) (inc ?x)]
@@ -132,7 +132,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :wrong-arity
+            {:id  :wrong-arity
              :level 3
              :group :syntax
              :type  :project
@@ -148,7 +148,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :word-count
+            {:id  :word-count
              :type  :file
              :dependencies []
              :injections []
@@ -162,7 +162,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :has-docstring-check
+            {:id  :has-docstring-check
              :type  :function
              :dependencies []
              :injections []
@@ -180,7 +180,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +jurisdictions+
-            {:name  :hello-example
+            {:id  :hello-example
              :type  :file
              :path  "src/hello/example.clj"}))
 
@@ -191,14 +191,14 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +jurisdictions+
-            {:name  :multi-example
+            {:id  :multi-example
              :type  :multi
              :files ["src/hello/example.clj"
                      "src/hello/world.clj"]}))
 
 (comment
   (add-item +jurisdictions+
-            {:name  :pattern-example
+            {:id  :pattern-example
              :type  :multi
              :patterns [#"src/hello"]}))
 
@@ -207,7 +207,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +jurisdictions+
-            {:name  :hello-project
+            {:id  :hello-project
              :type  :project
              :exclude {:src-files  []
                        :test-files []}}))
@@ -229,7 +229,7 @@ If we can provide metrics and views on how a system is performing over time, the
   (defproject temp "0.1.0-SNAPSHOT"
     :description "FIXME: write description"
     :url "http://example.com/FIXME"
-    :license {:name "Eclipse Public License"
+    :license {:id "Eclipse Public License"
               :url "http://www.eclipse.org/legal/epl-v10.html"}
     :dependencies [[org.clojure/clojure "1.6.0"]
                    [org.clojure/test.check "0.5.8"]
@@ -242,7 +242,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :project-meta
+            {:id  :project-meta
              :type  :project
              :dependencies []
              :injections []
@@ -268,7 +268,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :project-dependencies
+            {:id  :project-dependencies
              :type  :project
              :dependencies []
              :injections []
@@ -292,7 +292,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :project-newest
+            {:id  :project-newest
              :type  :project
              :dependencies []
              :injections []
@@ -320,7 +320,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :ns-indicator
+            {:id  :ns-indicator
              :type  :file
              :dependencies [[slamhound "1.5.5"]]
              :injections [(use 'slam.hound)]
@@ -349,7 +349,7 @@ If we can provide metrics and views on how a system is performing over time, the
 
 (comment
   (add-item +indicators+
-            {:name  :docstring-indicator
+            {:id  :docstring-indicator
              :type  :function
              :dependencies []
              :injections []
@@ -363,7 +363,7 @@ If we can provide metrics and views on how a system is performing over time, the
       :diagnosis [{:indicator :docstring-indicator
                    :jurisdiction :hello-example
                    :results [{:file "src/hello/example.clj"
-                              :namespace hello.example
+                              :idspace hello.example
                               :results [{:function add-n
                                          :stat true
                                          :summary {:line 3}}

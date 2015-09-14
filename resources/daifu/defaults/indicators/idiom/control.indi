@@ -1,4 +1,4 @@
-{:name  :control
+{:id  :control
  :type  :idiom
  :rules  [[(if ?x ?y nil) (when ?x ?y)]
           [(if ?x nil ?y) (when-not ?x ?y)]

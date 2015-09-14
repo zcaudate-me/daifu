@@ -61,7 +61,7 @@
   (not (nil? @(:main indicator))))
 
 
-(def ind1 
+(def ind1
   (indicator {:type :function
               :dependencies '[[im.chit/hara.common.checks "2.2.7"]]
               :injections '[(require '[hara.common.checks :as checks])]
@@ -134,24 +134,24 @@
 
 (comment
   (./pull '[jonase/kibit "0.1.2"])
-  
+
   (defgroup indicators {:tag :indicator
-                        :key :name
+                        :key :id
                         :constructor indicator})
 
-  (defitem indicators 
-    {:name :project-meta
+  (defitem indicators
+    {:id :project-meta
      :type :project
      :dependencies []
      :function '(fn [project]
                   )})
 
   (defgroup jurisdiction {:tag :jurisdiction
-                          :key :name
+                          :key :id
                           :constructor jurisdiction})
 
   (defitem jurisdiction
-    {:name :hello-example
+    {:id :hello-example
      :type :single
      :path "src/hello/example.clj"})
 

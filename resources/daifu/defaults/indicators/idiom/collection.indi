@@ -1,4 +1,4 @@
-{:name  :collection
+{:id  :collection
  :type  :idiom
  :rules  [;;vector
           [(conj [] . ?x) (vector . ?x)]
