@@ -7,7 +7,8 @@
 (defn activate
   [indicator]
   (if-not @(:main indicator)
-    (reset! (:main indicator) (activate-indicator indicator)))
+    (reset! (:main indicator)
+            (activate-indicator indicator)))
   indicator)
 
 (defn activated?
@@ -16,9 +17,9 @@
 
 (defn invoke-indicator
   [indicator input]
-  (if-not (activated? obj)
-    (activate obj))
-  (@(:main obj) input))
+  (if-not (activated? indicator)
+    (activate indicator))
+  (@(:main indicator) input))
 
 (defrecord Indicator []
   clojure.lang.IFn
@@ -77,6 +78,6 @@
                :source '(fn [zloc] (zip/sexpr zloc))})
    (zip/of-string "(+ 1 1)"))
 
-
+  (./pull-project)
 
   )

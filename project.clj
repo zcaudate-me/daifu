@@ -9,6 +9,8 @@
                  [jonase/kibit "0.1.2"]
                  [im.chit/gita "0.2.0"]]
   :profiles {:dev {:dependencies [[midje "1.7.0"]
+                                  [leiningen "2.5.2"]
+                                  [com.cemerick/pomegranate "0.3.0"]
                                   [helpshift/hydrox "0.1.3"]]
                    :plugins [[lein-midje "3.1.3"]]}}
   :documentation {:site  "daifu"
