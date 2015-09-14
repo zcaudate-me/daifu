@@ -38,7 +38,7 @@
     (ns-unmap 'leiningen.core.project 'project)
     @project))
 
-(defmulti list-files (fn [repo jurisdiction] (type repo)))
+(defmulti list-files (fn [repo _] (type repo)))
 
 (defn file-seq-filter
   "A tree seq on java.io.Files"
@@ -60,7 +60,7 @@
          (map #(subs (.getCanonicalPath %) (inc len))))))
 
 (defmethod list-files org.eclipse.jgit.lib.Repository 
-  [repo {:keys [comparison current previous source-paths] :as jurisdiction}]
+  [repo {:keys [comparison current previous] :as jurisdiction}]
   (if comparison
     (->> (git/list-file-changes repo previous current)
          (map :path))
@@ -94,15 +94,39 @@
   (-> pick-files-base
       wrap-source-paths))
 
+(defmulti retrieve-file (fn [repo _] (type repo)))
+
+(defmethod retrieve-file java.io.File
+  [repo {:keys [path]}]
+  (io/reader (io/file repo path)))
+
+(defmethod retrieve-file org.eclipse.jgit.lib.Repository 
+  [repo opts]
+  (io/reader (git/raw repo opts)))
+
+
+
 (comment
+
+  (slurp (retrieve-file (git/repository) {:path "project.clj"}))
+  
   (pick-files (io/file ".") {:type :project})
 
   (pick-files (git/repository) {:type :project})
   
+  (pick-files (git/repository)
+              {:type :project
+               :current  {:branch "master"
+                          :commit "HEAD"}
+               :previous {:branch "master"
+                          :commit "HEAD^2"}
+               :comparison true
+               })
+  
   (list-files (git/repository) {:current  {:branch "master"
                                            :commit "HEAD"}
                                 :previous {:branch "master"
-                                           :commit "HEAD^1"}
+                                           :commit "HEAD^2"}
                                 :comparison true
                                 :source-paths ["src"]})
 
