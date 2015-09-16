@@ -78,40 +78,25 @@
   (mapv (fn [rule]
           (cond (vector? rule)
                 (list 'kibit.rules.util/compile-rule (list 'quote rule))
-                
+
                 :else
                 (list 'eval rule)))
         (:rules indicator)))
+
+(defn convert-meta [{:keys [line column] :as m}]
+  (-> (dissoc m :line :column)
+      (assoc :row line :col column)))
 
 (defmethod activate-indicator
   :idiom
   [indicator]
   (activate-indicator-helper indicator '[[clojure.core.logic :as logic]
                                          [clojure.core.logic.unifier :as unifier]
-                                         [kibit.rules.util :as util]]
+                                         [kibit.rules.util :as util]
+                                         [daifu.diagnosis.indicator :refer [convert-meta]]]
                              (fn [indicator]
                                (list 'fn '[reader]
-                                     (list 'kibit.check/check-reader 'reader
-                                           :rules (compiled-rules indicator))))))
-
-(comment
-  (require '[rewrite-clj.zip :as zip]
-           '[clojure.java.io :as io])
-
-  (:main (activate (indicator {:id    :plus-one
-                               :type  :idiom
-                               :rules '[[(+ ?x 1) (inc ?x)]]})))
-  
-  ((indicator {:id    :plus-one
-               :type  :idiom
-               :rules '[[(+ ?x 1) (inc ?x)]]})
-   (io/reader (io/file "src/daifu/diagnosis/indicator.clj")))
-  
-  ((indicator {:id :hello-world
-               :type :function
-               :source '(fn [zloc] (zip/sexpr zloc))})
-   (zip/of-string "(+ 1 1)"))
-
-  
-
-  (./pull-project))
+                                     (list '->>
+                                           (list 'kibit.check/check-reader 'reader
+                                                 :rules (compiled-rules indicator))
+                                           (list 'map 'convert-meta))))))

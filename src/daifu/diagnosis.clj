@@ -48,7 +48,7 @@
                  (sequential? result)
                  (assoc info :results (vec result)
                         :stat (calculate-stat result))
-                 
+
                  :else
                  (assoc info :result result))))
        results infos))
@@ -104,49 +104,3 @@
     (-> (jurisdiction/retrieve-file repo (assoc opts :path "project.clj"))
         (slurp)
         (zip/of-string))))
-
-
-
-
-
-(comment
-  (diagnose
-   (io/file ".")
-   (indicator/indicator
-    (read-string (slurp "resources/daifu/defaults/indicators/form/record_count.indi")))
-   {:id :default-project
-    :type :project})
-
-  (diagnose
-   (io/file ".")
-   (indicator/indicator
-    (read-string (slurp "resources/daifu/defaults/indicators/file/line_count.indi")))
-   {:id :default-project
-    :type :project})
-
-  (diagnose
-   (io/file ".")
-   (indicator/indicator
-    (read-string (slurp "resources/daifu/defaults/indicators/function/no_docstring.indi")))
-   {:id :default-project
-    :type :project})
-
-  (diagnose
-   (io/file ".")
-   (indicator/indicator
-    (read-string (slurp "resources/daifu/defaults/indicators/function/token_count.indi")))
-   {:id :default-project
-    :type :project})
-  
-  (diagnose
-   (io/file ".")
-   (indicator/indicator
-    (read-string (slurp "resources/daifu/defaults/indicators/project/project_meta.indi")))
-   {:id :default-project
-    :type :project})
-  
-  )
-
-
-  
-  

@@ -27,7 +27,7 @@
       (project/read-raw)
       (assoc :jurisdisction jurisdiction)))
 
-(defmethod read-project org.eclipse.jgit.lib.Repository 
+(defmethod read-project org.eclipse.jgit.lib.Repository
   [repo {:keys [commit branch] :as jurisdiction}]
   (ns/eval-ns 'leiningen.core.project
               [(->> (assoc jurisdiction :path "project.clj")
@@ -57,7 +57,7 @@
          (filter #(not (.isDirectory %)))
          (map #(subs (.getCanonicalPath %) (inc len))))))
 
-(defmethod list-files org.eclipse.jgit.lib.Repository 
+(defmethod list-files org.eclipse.jgit.lib.Repository
   [repo {:keys [comparison current previous] :as jurisdiction}]
   (if comparison
     (->> (git/list-file-changes repo previous current)
@@ -112,61 +112,7 @@
   (try (io/reader (io/file (.getCanonicalPath repo) path))
        (catch Exception e)))
 
-(defmethod retrieve-file org.eclipse.jgit.lib.Repository 
+(defmethod retrieve-file org.eclipse.jgit.lib.Repository
   [repo opts]
   (try (io/reader (git/raw repo opts))
        (catch Exception e)))
-
-
-
-(comment
-
-  (slurp (retrieve-file (git/repository) {:path "project.clj"}))
-  
-  (pick-files (io/file ".") {:type :project})
-
-  (pick-files (git/repository) {:type :project})
-  
-  (pick-files (git/repository)
-              {:type :project
-               :current  {:branch "master"
-                          :commit "HEAD"}
-               :previous {:branch "master"
-                          :commit "HEAD^2"}
-               :comparison true
-               })
-  
-  (list-files (git/repository) {:current  {:branch "master"
-                                           :commit "HEAD"}
-                                :previous {:branch "master"
-                                           :commit "HEAD^2"}
-                                :comparison true
-                                :source-paths ["src"]})
-
-  (list-files (git/repository) {:current  {:branch "master"
-                                           :commit "HEAD"}
-                                :previous {:branch "master"
-                                           :commit "HEAD"}
-                                :comparison true
-                                :source-paths ["src"]})
-
-  
-  
-  (pick-files (git/repository)
-              {:type :project})
-
-  (pick-files (git/repository)
-              {:type :multi
-               :patterns [#"daifu"]})
-
-  (pick-files (git/repository)
-              {:type :file
-               :path "src/daifu/core.clj"
-               :comparison true})
-
-  (jurisdiction {:id :default
-                 :type :project
-                 :version  {:branch nil
-                            :commit nil}
-                 :previous {:branch nil
-                            :commit nil}}))
