@@ -1,5 +1,6 @@
 {:id :line-count
  :type :file
+ :doc  "counts the number of lines in a file"
  :injections [(require '[clojure.string :as string])]
  :source (fn [reader]
               (count (string/split-lines (slurp reader))))}

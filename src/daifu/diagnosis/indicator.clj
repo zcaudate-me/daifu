@@ -30,10 +30,9 @@
 
 (defmethod print-method Indicator
   [v w]
-  (.write w (str "#" (name (:type v)) " "
-                 (into {} (-> (dissoc v :type :main :source :dependencies :injections)
-                              (assoc :activated (activated? v))
-                              (assoc :* (vec (keys (dissoc v :id :type :main)))))))))
+  (.write w (str "#" (name (:type v)) [(name (:id v))] " "
+                 (-> {:activated (activated? v)}
+                     (assoc :* (vec (keys (dissoc v :id :type :main))))))))
 
 (defn indicator [m]
   (-> (map->Indicator m)
@@ -77,11 +76,9 @@
   [indicator]
   (activate-indicator-helper indicator '[[clojure.core.logic :as logic]]))
 
-
-
 (comment
   (require '[rewrite-clj.zip :as zip])
-
+  
   ((indicator {:id :hello-world
                :type :function
                :source '(fn [zloc] (zip/sexpr zloc))})
@@ -89,6 +86,4 @@
 
   
 
-  (./pull-project)
-
-  )
+  (./pull-project))

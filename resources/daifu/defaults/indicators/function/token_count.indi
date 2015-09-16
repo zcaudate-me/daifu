@@ -1,5 +1,6 @@
 {:id :token-count
  :type :function
+ :doc "counts the number of tokens in a function"
  :source (fn [zloc]
             (->> (zip/sexpr zloc)
                  (tree-seq coll? identity)

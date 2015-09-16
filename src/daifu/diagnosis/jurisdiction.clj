@@ -42,14 +42,11 @@
 (defmulti list-files (fn [repo _] (type repo)))
 
 (defn file-seq-filter
-  "A tree seq on java.io.Files"
-  {:added "1.0"
-   :static true}
   [dir filter]
-    (tree-seq
-     (fn [^java.io.File f] (and (. f (isDirectory)) (filter f)))
-     (fn [^java.io.File d] (seq (. d (listFiles))))
-     dir))
+  (tree-seq
+   (fn [^java.io.File f] (and (. f (isDirectory)) (filter f)))
+   (fn [^java.io.File d] (seq (. d (listFiles))))
+   dir))
 
 (defmethod list-files java.io.File
   [repo _]

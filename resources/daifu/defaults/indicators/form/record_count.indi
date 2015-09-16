@@ -1,4 +1,5 @@
 {:id   :record-count
  :type :form
+ :doc "returns true on a form matching defrecord"
  :pattern defrecord
  :source (fn [zloc] true)}

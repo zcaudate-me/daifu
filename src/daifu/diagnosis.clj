@@ -81,14 +81,19 @@
     (format-results results files)))
 
 (defn diagnose [repo indicator jurisdiction]
-  (let [results (case (:type indicator)
+  (let [output (case (:type indicator)
                   :project  (indicator repo (assoc (jurisdiction/read-project repo jurisdiction) :jurisdisction jurisdiction))
                   :file     (diagnose-file repo indicator jurisdiction)
                   :function (diagnose-form repo indicator jurisdiction)
                   :form     (diagnose-form repo indicator jurisdiction)
                   :idiom  (throw (Exception. "Not Supported")))
+        [results info] (cond (sequential? output)
+                             [output nil]
+                             (map? output)
+                             [(:results output) (dissoc output :results)])
         stat    (calculate-stat results)]
-    (merge {:indicator     (:id indicator)
+    (merge info
+           {:indicator     (:id indicator)
             :jurisdisction (:id jurisdiction)
             :stat    stat
             :results (vec results)}
@@ -99,6 +104,9 @@
     (-> (jurisdiction/retrieve-file repo (assoc opts :path "project.clj"))
         (slurp)
         (zip/of-string))))
+
+
+
 
 
 (comment
@@ -135,7 +143,9 @@
    (indicator/indicator
     (read-string (slurp "resources/daifu/defaults/indicators/project/project_meta.indi")))
    {:id :default-project
-    :type :project}))
+    :type :project})
+  
+  )
 
 
   

@@ -1,5 +1,6 @@
 {:id :project-meta
  :type :project
+ :doc "checks for irregular url and description in project.clj"
  :injections [(require '[rewrite-clj.zip :as zip]
                        '[daifu.diagnosis :refer [project-zloc]])]
  :source (fn [repo project]
@@ -18,4 +19,4 @@
 
                                      (.startsWith (-> desc-zloc zip/next zip/sexpr) "FIXME")
                                      (assoc (meta (zip/node desc-zloc)) :msg "please add proper description"))]
-              (filterv identity [url-msg desc-msg])))}
+              {:path "project.clj" :results (filterv identity [url-msg desc-msg])}))}
