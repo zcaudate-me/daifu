@@ -86,7 +86,7 @@
                   :file     (diagnose-file repo indicator jurisdiction)
                   :function (diagnose-form repo indicator jurisdiction)
                   :form     (diagnose-form repo indicator jurisdiction)
-                  :idiom  (throw (Exception. "Not Supported")))
+                  :idiom    (diagnose-file repo indicator jurisdiction))
         [results info] (cond (sequential? output)
                              [output nil]
                              (map? output)
@@ -97,7 +97,7 @@
             :jurisdisction (:id jurisdiction)
             :stat    stat
             :results (vec results)}
-           (select-keys jurisdiction [:commit :branch]))))
+           (select-keys jurisdiction [:current :previous :comparison]))))
 
 (defn project-zloc [repo project]
   (let [opts (select-keys (:jurisdisction project) [:branch :commit])]

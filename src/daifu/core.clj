@@ -1,6 +1,7 @@
 (ns daifu.core
   (:require [clojure.tools.cli :as cli]
             [clojure.java.io :as io]
+            [gita.core :as git]
             [daifu.diagnosis :as diagnosis]
             [daifu.diagnosis.indicator :as indicator]
             [daifu.diagnosis.jurisdiction :as jurisdiction]))
@@ -46,7 +47,10 @@
 
 (def default-jurisdictions
   {:default (jurisdiction/jurisdiction {:id :default
-                                        :type :project})})
+                                        :type :project
+                                        :comparison true
+                                        :current {:commit "HEAD"}
+                                        :previous {:commit "HEAD^1"}})})
 
 (defrecord Visitation [])
 
@@ -95,7 +99,7 @@
                               vec))
         opts (assoc-in opts [:repository]
                        (if (git-repo? (:path opts))
-                         (gita.core/repository (:path opts))
+                         (git/repository (:path opts))
                          (io/file (:path opts))))]
     (map->Visitation opts)))
 
@@ -124,9 +128,8 @@
                              "-f" "oeuoeu"] cli-options))
   {:path "/Users/chris/Development/helpshift/daifu", :format :edn, :output "daifu.out", :indicator-paths ["qa/indicators" "qa/indicators2"]}
   
-  
   (load-default-indicators)
-
+  
   (visitation {;;:indicators (load-default-indicators)
                ;;:jurisdictions default-jurisdiction
                :no-defaults true

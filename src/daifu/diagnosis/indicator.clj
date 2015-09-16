@@ -30,6 +30,7 @@
 
 (defmethod print-method Indicator
   [v w]
+  (+ 1 1)
   (.write w (str "#" (name (:type v)) [(name (:id v))] " "
                  (-> {:activated (activated? v)}
                      (assoc :* (vec (keys (dissoc v :id :type :main))))))))
@@ -39,15 +40,17 @@
       (assoc :main (atom nil))))
 
 (defn activate-indicator-helper
-  [indicator requires]
-  (still/distill (:dependencies indicator))
-  (ns/eval-temp-ns
-   (conj (apply vector
-                (->> requires
-                     (map #(list 'quote %))
-                     (apply list 'require))
-                (:injections indicator))
-         (:source indicator))))
+  ([indicator requires]
+   (activate-indicator-helper indicator requires :source))
+  ([{:keys [dependencies] :as indicator} requires func]
+   (if dependencies (still/distill dependencies))
+   (ns/eval-temp-ns
+    (conj (apply vector
+                 (->> requires
+                      (map #(list 'quote %))
+                      (apply list 'require))
+                 (:injections indicator))
+          (func indicator)))))
 
 (defmethod activate-indicator
   :form
@@ -71,13 +74,38 @@
   [indicator]
   (activate-indicator-helper indicator '[[leiningen.core.project :as project]]))
 
+(defn compiled-rules [indicator]
+  (mapv (fn [rule]
+          (cond (vector? rule)
+                (list 'kibit.rules.util/compile-rule (list 'quote rule))
+                
+                :else
+                (list 'eval rule)))
+        (:rules indicator)))
+
 (defmethod activate-indicator
   :idiom
   [indicator]
-  (activate-indicator-helper indicator '[[clojure.core.logic :as logic]]))
+  (activate-indicator-helper indicator '[[clojure.core.logic :as logic]
+                                         [clojure.core.logic.unifier :as unifier]
+                                         [kibit.rules.util :as util]]
+                             (fn [indicator]
+                               (list 'fn '[reader]
+                                     (list 'kibit.check/check-reader 'reader
+                                           :rules (compiled-rules indicator))))))
 
 (comment
-  (require '[rewrite-clj.zip :as zip])
+  (require '[rewrite-clj.zip :as zip]
+           '[clojure.java.io :as io])
+
+  (:main (activate (indicator {:id    :plus-one
+                               :type  :idiom
+                               :rules '[[(+ ?x 1) (inc ?x)]]})))
+  
+  ((indicator {:id    :plus-one
+               :type  :idiom
+               :rules '[[(+ ?x 1) (inc ?x)]]})
+   (io/reader (io/file "src/daifu/diagnosis/indicator.clj")))
   
   ((indicator {:id :hello-world
                :type :function

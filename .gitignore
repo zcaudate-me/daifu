@@ -13,3 +13,6 @@ pom.xml.asc
 .lein-repl-history
 .sniper-analysis-cache.clj
 /docs
+.#*
+#*
+*#
