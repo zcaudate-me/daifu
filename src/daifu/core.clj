@@ -122,22 +122,3 @@
         opts    (:options summary)
         visit (visitation (dissoc opts :diagnosis))]
     (diagnosis visit (:checkups visit))))
-
-(comment
-  (:options (cli/parse-opts ["-i" "qa/indicators" "-i" "qa/indicators2"
-                             "-f" "oeuoeu"] cli-options))
-  {:path "/Users/chris/Development/helpshift/daifu", :format :edn, :output "daifu.out", :indicator-paths ["qa/indicators" "qa/indicators2"]}
-  
-  (load-default-indicators)
-  
-  (visitation {;;:indicators (load-default-indicators)
-               ;;:jurisdictions default-jurisdiction
-               :no-defaults true
-               :indicator-paths ["resources/daifu"]
-               :jurisdiction-paths []
-               :path "/Users/chris/Development/helpshift/daifu"
-               :format :edn})
-
-  (-main "-i" "resources/daifu" "-c" "resources/daifu/checkups.daifu")
-  
-  )
