@@ -1,0 +1,21 @@
+{:id :project-meta
+ :type :project
+ :injections [(require '[rewrite-clj.zip :as zip]
+                       '[daifu.diagnosis :refer [project-zloc]])]
+ :source (fn [repo project]
+            (let [zloc (project-zloc repo project)
+                  project-zloc (zip/find-depth-first zloc   #(= (zip/sexpr %) 'defproject))
+                  url-zloc     (zip/find-next project-zloc  #(= (zip/sexpr %) :url))
+                  desc-zloc    (zip/find-next project-zloc  #(= (zip/sexpr %) :description))
+                  url-msg      (cond (nil? url-zloc)
+                                     {:msg "missing project url"}
+
+                                     (< 0 (.indexOf (-> url-zloc zip/next zip/sexpr) "FIXME"))
+                                     (assoc (meta (zip/node url-zloc)) :msg "please add proper url"))
+
+                  desc-msg     (cond (nil? desc-zloc)
+                                     {:msg "missing project description"}
+
+                                     (.startsWith (-> desc-zloc zip/next zip/sexpr) "FIXME")
+                                     (assoc (meta (zip/node desc-zloc)) :msg "please add proper description"))]
+              (filterv identity [url-msg desc-msg])))}

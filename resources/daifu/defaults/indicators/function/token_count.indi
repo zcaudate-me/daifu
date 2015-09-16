@@ -1,0 +1,6 @@
+{:id :token-count
+ :type :function
+ :source (fn [zloc]
+            (->> (zip/sexpr zloc)
+                 (tree-seq coll? identity)
+                 (count)))}

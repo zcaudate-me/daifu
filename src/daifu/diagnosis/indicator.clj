@@ -1,4 +1,4 @@
-(ns daifu.core.indicator
+(ns daifu.diagnosis.indicator
   (:require [hara.namespace.eval :as ns]
             [alembic.still :as still]))
 
@@ -16,15 +16,17 @@
   (not (nil? @(:main indicator))))
 
 (defn invoke-indicator
-  [indicator input]
+  [indicator & inputs]
   (if-not (activated? indicator)
     (activate indicator))
-  (@(:main indicator) input))
+  (apply @(:main indicator) inputs))
 
 (defrecord Indicator []
   clojure.lang.IFn
   (invoke [indicator input]
-          (invoke-indicator indicator input)))
+          (invoke-indicator indicator input))
+  (invoke [indicator x y]
+          (invoke-indicator indicator x y)))
 
 (defmethod print-method Indicator
   [v w]
@@ -70,6 +72,13 @@
   [indicator]
   (activate-indicator-helper indicator '[[leiningen.core.project :as project]]))
 
+(defmethod activate-indicator
+  :idiom
+  [indicator]
+  (activate-indicator-helper indicator '[[clojure.core.logic :as logic]]))
+
+
+
 (comment
   (require '[rewrite-clj.zip :as zip])
 
@@ -77,6 +86,8 @@
                :type :function
                :source '(fn [zloc] (zip/sexpr zloc))})
    (zip/of-string "(+ 1 1)"))
+
+  
 
   (./pull-project)
 

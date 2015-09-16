@@ -21,22 +21,23 @@
 (defmulti read-project (fn [repo opts] (type repo)))
 
 (defmethod read-project java.io.File
-  [repo _]
+  [repo jurisdiction]
   (-> (.getCanonicalPath repo)
       (str (System/getProperty "file.separator") "project.clj")
-      (project/read-raw)))
+      (project/read-raw)
+      (assoc :jurisdisction jurisdiction)))
 
 (defmethod read-project org.eclipse.jgit.lib.Repository 
-  [repo {:keys [commit branch] :as opts}]
+  [repo {:keys [commit branch] :as jurisdiction}]
   (ns/eval-ns 'leiningen.core.project
-              [(->> (assoc opts :path "project.clj")
+              [(->> (assoc jurisdiction :path "project.clj")
                     (git/raw repo)
                     (slurp)
                     (read-string)
                     (list 'eval))])
   (let [project (resolve 'leiningen.core.project/project)]
     (ns-unmap 'leiningen.core.project 'project)
-    @project))
+    (assoc @project :jurisdisction jurisdiction)))
 
 (defmulti list-files (fn [repo _] (type repo)))
 
@@ -90,19 +91,34 @@
       (->> (f repo (assoc jurisdiction :source-paths source-paths))
            (filter (fn [x] (some #(.startsWith x %) source-paths)))))))
 
+(defn wrap-clj-only [f]
+  (fn [repo jurisdiction]
+    (let [result (f repo jurisdiction)]
+      (filter (fn [file]
+                (and (-> (clojure.string/split file #"/")
+                         (last)
+                         (.startsWith ".")
+                         not)
+                     (or (.endsWith file ".clj")
+                         (.endsWith file ".cljs")
+                         (.endsWith file ".cljc")))) result))))
+
 (def pick-files
   (-> pick-files-base
-      wrap-source-paths))
+      wrap-source-paths
+      wrap-clj-only))
 
 (defmulti retrieve-file (fn [repo _] (type repo)))
 
 (defmethod retrieve-file java.io.File
   [repo {:keys [path]}]
-  (io/reader (io/file repo path)))
+  (try (io/reader (io/file (.getCanonicalPath repo) path))
+       (catch Exception e)))
 
 (defmethod retrieve-file org.eclipse.jgit.lib.Repository 
   [repo opts]
-  (io/reader (git/raw repo opts)))
+  (try (io/reader (git/raw repo opts))
+       (catch Exception e)))
 
 
 

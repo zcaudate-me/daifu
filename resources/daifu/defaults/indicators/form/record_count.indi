@@ -1,0 +1,4 @@
+{:id   :record-count
+ :type :form
+ :pattern defrecord
+ :source (fn [zloc] true)}

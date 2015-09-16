@@ -1,0 +1,7 @@
+{:id :no-docstring
+ :type :function
+ :source (fn [zloc]
+            (-> (zip/sexpr zloc)
+                (nth 2)
+                string?
+                not))}
