@@ -6,7 +6,9 @@
             [daifu.diagnosis.jurisdiction :as jurisdiction]))
 
 (def cli-options
-  [["-c" "--checkups-file PATH" "Path to the checkups file that will be run"]
+  [["-p" "--path PATH" "Path to the repository "
+    :default (System/getProperty "user.dir")]
+   ["-c" "--checkups-file PATH" "Path to the checkups file that will be run"]
    ["-f" "--format FORMAT" "Format of output {edn|json|html}"
     :default :edn
     :parse-fn keyword
@@ -75,6 +77,9 @@
   (if path
     (-> (slurp path) read-string)))
 
+(defn git-repo? [path]
+  (.exists (io/file path ".git")))
+
 (defn visitation [opts]
   (let [opts (if-not (:no-defaults opts)
                (update-in opts [:indicators] merge (load-default-indicators))
@@ -87,7 +92,11 @@
         opts (update-in opts [:checkups]
                         #(->> (load-checkups (:checkups-file opts))
                               (concat %)
-                              vec))]
+                              vec))
+        opts (assoc-in opts [:repository]
+                       (if (git-repo? (:path opts))
+                         (gita.core/repository (:path opts))
+                         (io/file (:path opts))))]
     (map->Visitation opts)))
 
 (defn diagnosis-single [visitation [ik jk]]
@@ -105,13 +114,15 @@
   (vec (keep (partial diagnosis-single visitation) checkups)))
 
 (defn -main [& args]
-  (let [opts (cli/parse-opts args cli-options)
+  (let [summary (cli/parse-opts args cli-options)
+        opts    (:options summary)
         visit (visitation (dissoc opts :diagnosis))]
     (diagnosis visit (:checkups visit))))
 
 (comment
   (:options (cli/parse-opts ["-i" "qa/indicators" "-i" "qa/indicators2"
                              "-f" "oeuoeu"] cli-options))
+  {:path "/Users/chris/Development/helpshift/daifu", :format :edn, :output "daifu.out", :indicator-paths ["qa/indicators" "qa/indicators2"]}
   
   
   (load-default-indicators)
@@ -121,4 +132,9 @@
                :no-defaults true
                :indicator-paths ["resources/daifu"]
                :jurisdiction-paths []
-               :format :edn}))
+               :path "/Users/chris/Development/helpshift/daifu"
+               :format :edn})
+
+  (-main "-i" "resources/daifu" "-c" "resources/daifu/checkups.daifu")
+  
+  )
