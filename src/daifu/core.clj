@@ -121,7 +121,10 @@
                  :jurisdictions
                  (get jk))]
     (if (and indi juri)
-      (diagnosis/diagnose (:repository visitation) indi juri))))
+      (try
+        (diagnosis/diagnose (:repository visitation) indi juri)
+        (catch Throwable t
+          (println "Failure for indicator" indi ", jurisdiction" juri))))))
 
 (defn diagnosis [visitation checkups]
   (let [results (vec (keep (partial diagnosis-single visitation) checkups))

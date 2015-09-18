@@ -1,4 +1,4 @@
-(defproject helpshift/daifu "0.1.3"
+(defproject helpshift/daifu "0.1.5"
   :description "checkups for your code"
   :url "https://www.github.com/helpshift/daifu"
   :license {:id "Eclipse Public License"

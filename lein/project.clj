@@ -1,4 +1,4 @@
-(defproject lein-daifu "0.1.3"
+(defproject lein-daifu "0.1.5"
   :description "leiningen plugin for daifu"
   :url "https://www.github.com/helpshift/daifu"
   :license {:name "Eclipse Public License"
