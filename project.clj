@@ -1,4 +1,4 @@
-(defproject helpshift/daifu "0.1.1"
+(defproject helpshift/daifu "0.1.2"
   :description "checkups for your code"
   :url "https://www.github.com/helpshift/daifu"
   :license {:id "Eclipse Public License"
@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/tools.cli "0.3.3"]
                  [jonase/kibit "0.1.2"]
+                 [cheshire "5.5.0"]
                  [alembic "0.3.2"]
                  [im.chit/hara.namespace.eval "2.2.11"]
                  [im.chit/gita "0.2.1"]

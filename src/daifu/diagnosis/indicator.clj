@@ -92,11 +92,12 @@
   [indicator]
   (activate-indicator-helper indicator '[[clojure.core.logic :as logic]
                                          [clojure.core.logic.unifier :as unifier]
-                                         [kibit.rules.util :as util]
+                                         [kibit.rules.util :as rules]
+                                         [kibit.check :as check]
                                          [daifu.diagnosis.indicator :refer [convert-meta]]]
                              (fn [indicator]
                                (list 'fn '[reader]
                                      (list '->>
-                                           (list 'kibit.check/check-reader 'reader
+                                           (list 'check/check-reader 'reader
                                                  :rules (compiled-rules indicator))
                                            (list 'map 'convert-meta))))))
