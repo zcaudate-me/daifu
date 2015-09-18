@@ -61,23 +61,29 @@
          :name (-> zloc zip/sexpr second)))
 
 (defn diagnose-form-single [indicator {:keys [reader path]}]
-  (let [zloc    (zip/of-string (slurp reader))
-        ns      (diagnose-form-ns zloc)
-        funcs   (query/select zloc [(or (:pattern indicator) '(#{defn defn-} & _))] {:walk :top})
-        metas   (map diagnose-form-metas funcs)
-        results (map indicator funcs)]
-    [ns (format-results results metas)]))
+  (try (let [zloc    (zip/of-string (slurp reader))
+             ns      (diagnose-form-ns zloc)
+             funcs   (query/select zloc [(or (:pattern indicator) '(#{defn defn-} & _))] {:walk :top})
+             metas   (map diagnose-form-metas funcs)
+             results (map indicator funcs)]
+         [ns (format-results results metas)])
+       (catch Throwable t
+         (println "Exception occured using" indicator "on file" path))))
 
 (defn diagnose-form [repo indicator jurisdiction]
   (let [files   (retrieve repo jurisdiction)
-        results (map (partial diagnose-form-single indicator) files)
+        results (keep (partial diagnose-form-single indicator) files)
         nss     (map first results)
         results (map second results)]
     (format-results results (map #(assoc %1 :ns %2) files nss))))
 
 (defn diagnose-file [repo indicator jurisdiction]
   (let [files   (retrieve repo jurisdiction)
-        results (map #(-> % :reader indicator) files)]
+        safe-fn (fn [f]
+                  (try (indicator (:reader f))
+                       (catch Throwable t
+                         (println "Exception occured using" indicator "on file" (:path f)))))
+        results (keep safe-fn files)]
     (format-results results files)))
 
 (defn diagnose [repo indicator jurisdiction]

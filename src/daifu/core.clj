@@ -104,7 +104,7 @@
                               (concat %)
                               vec))
         opts (if (empty? (:checkups opts))
-               (assoc opts :checkups (vec (map vector (keys (:indicators opts)))))
+               (assoc opts :checkups (vec (map vector (sort (keys (:indicators opts))))))
                opts)
         opts (assoc-in opts [:repository]
                        (if (and (git-repo? (:path opts)) (:use-git opts))
