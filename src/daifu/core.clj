@@ -42,12 +42,12 @@
 
 (defn load-default-indicators []
   (->> *default-indicators*
-       (map (fn [path]
+       (mapv (fn [path]
               (-> (io/resource (str "daifu/defaults/indicators/" path))
                   slurp
                   read-string
                   indicator/indicator)))
-       (map (juxt :id identity))
+       (mapv (juxt :id identity))
        (into {})))
 
 (def default-jurisdictions
@@ -104,7 +104,7 @@
                               (concat %)
                               vec))
         opts (if (empty? (:checkups opts))
-               (assoc opts :checkups (vec (map vector (sort (keys (:indicators opts))))))
+               (assoc opts :checkups (mapv vector (sort (keys (:indicators opts)))))
                opts)
         opts (assoc-in opts [:repository]
                        (if (and (git-repo? (:path opts)) (:use-git opts))

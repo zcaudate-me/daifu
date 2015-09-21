@@ -7,10 +7,10 @@
 
 (defn retrieve [repo jurisdiction]
   (let [paths   (->> (jurisdiction/pick-files repo jurisdiction)
-                     (map (partial hash-map :path)))]
+                     (mapv (partial hash-map :path)))]
     (->> paths
-         (map (partial jurisdiction/retrieve-file repo))
-         (map #(assoc %1 :reader %2) paths)
+         (mapv (partial jurisdiction/retrieve-file repo))
+         (mapv #(assoc %1 :reader %2) paths)
          (filter :reader))))
 
 (defn calculate-stat [results]
@@ -37,21 +37,21 @@
           0 results))
 
 (defn format-results [results infos]
-  (map (fn [result info]
-         (let [info (dissoc info :reader)]
-           (cond (map? result)
-                 (let [{:keys [results] :as m} (merge result info)]
-                   (if results
-                     (assoc m :stat (calculate-stat results))
-                     m))
+  (mapv (fn [result info]
+          (let [info (dissoc info :reader)]
+            (cond (map? result)
+              (let [{:keys [results] :as m} (merge result info)]
+                (if results
+                  (assoc m :stat (calculate-stat results))
+                  m))
 
-                 (sequential? result)
-                 (assoc info :results (vec result)
-                        :stat (calculate-stat result))
+              (sequential? result)
+              (assoc info :results (vec result)
+                     :stat (calculate-stat result))
 
-                 :else
-                 (assoc info :result result))))
-       results infos))
+              :else
+              (assoc info :result result))))
+        results infos))
 
 (defn diagnose-form-ns [zloc]
   (second (zip/sexpr (first (query/select zloc '[ns] {:walk :top})))))
@@ -83,7 +83,8 @@
                   (try (indicator (:reader f))
                        (catch Throwable t
                          (println "Exception occured using" indicator "on file" (:path f)))))
-        results (doall (keep safe-fn files))]
+        results (->> (mapv safe-fn files)
+                     (filter identity))]
     (format-results results files)))
 
 (defn diagnose [repo indicator jurisdiction]
