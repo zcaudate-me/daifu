@@ -11,7 +11,24 @@
   (.write w (str "@" (name (:type v)) " "
                  (into {} (dissoc v :type)))))
 
-(defn jurisdiction [m]
+(defn jurisdiction?
+  "checks if the object is of type jurisdiction
+ 
+   (-> {:id :default
+        :type :project}
+       jurisdiction?)
+   => false"
+  {:added "0.1"} [x]
+  (instance? Jurisdiction x))
+
+(defn jurisdiction
+  "creates a jurisdiction
+ 
+   (-> (jurisdiction {:id :default
+                      :type :project})
+       jurisdiction?)
+   => true"
+  {:added "0.1"} [m]
   (map->Jurisdiction m))
 
 (def +default-jurisdiction+

@@ -1,6 +1,61 @@
 (ns daifu.diagnosis.jurisdiction-test
   (:use midje.sweet)
-  (:require [daifu.diagnosis.jurisdiction :as jurisdiction]))
+  (:require [daifu.diagnosis.jurisdiction :refer :all]))
+ 
+^{:refer daifu.diagnosis.jurisdiction/jurisdiction :added "0.1"}
+(fact "creates a jurisdiction"
+
+  (-> (jurisdiction {:id :default
+                     :type :project})
+      jurisdiction?)
+  => true)
+
+^{:refer daifu.diagnosis.jurisdiction/jurisdiction? :added "0.1"}
+(fact "checks if the object is of type jurisdiction"
+
+  (-> {:id :default
+       :type :project}
+      jurisdiction?)
+  => false)
+
+
+
+
+
+(comment21
+
+  (require '[clojure.java.io :as io])
+  (str (io/as-url (io/file ".")))
+  
+  
+  (require '[hydrox.core :as doc])
+
+  (def reg (doc/single-use))
+
+  (doc/import-docstring reg)
+  
+  (require '[rewrite-clj.zip :as zip]
+           '[clojure.java.io :as io])
+
+  (:main (activate (indicator {:id    :plus-one
+                               :type  :idiom
+                               :rules '[[(+ ?x 1) (inc ?x)]]})))
+
+  ((indicator {:id    :plus-one
+               :type  :idiom
+               :rules '[[(+ ?x 1) (inc ?x)]]})
+   (io/reader (io/file "src/daifu/diagnosis/indicator.clj")))
+
+
+  ((indicator {:id :hello-world
+               :type :function
+               :source '(fn [zloc] (zip/sexpr zloc))})
+   (zip/of-string "(+ 1 1)"))
+
+
+
+  (./pull-project))
+
 
 (comment
 
