@@ -44,4 +44,7 @@
   => (contains {:data 1, :stat 1})
 
   (result [1 2 3 4 5] average)
-  => (contains {:data [1 2 3 4 5], :stat 3}))
+  => (contains {:data [1 2 3 4 5], :stat 3})
+
+  (result [(result [1 2 3]) (result [4 5 6])] average)
+  => (contains {:stat 21/2}))

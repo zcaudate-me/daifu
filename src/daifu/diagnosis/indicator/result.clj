@@ -66,7 +66,8 @@
    
    (result? {:data 1})
    => false"
-  {:added "0.1"} [x]
+  {:added "0.1"}
+  [x]
   (instance? Result x))
 
 (defn result
@@ -82,7 +83,10 @@
    => (contains {:data 1, :stat 1})
  
    (result [1 2 3 4 5] average)
-   => (contains {:data [1 2 3 4 5], :stat 3})"
+   => (contains {:data [1 2 3 4 5], :stat 3})
+ 
+   (result [(result [1 2 3]) (result [4 5 6])] average)
+   => (contains {:stat 21/2})"
   {:added "0.1"}
   ([x] (result x ->stat))
   ([x stat-fn]
@@ -96,7 +100,3 @@
                    (result {:data x}))
          data (:data res)]
      (assoc res :stat (stat-fn data)))))
-
-
-(comment
-  (result [1 2 3] average))

@@ -3,7 +3,7 @@
             [daifu.diagnosis.indicator.invoke :as invoke]
             [clojure.java.io :as io]
             [clojure.set :as set]
-            [hara.sort.topological :as sort]))
+            [hara.data.nested :as nested]))
 
 (def ^:dynamic *default-indicators*
   ["file/line_count.indi"
@@ -11,6 +11,8 @@
    "function/no_docstring.indi"
    "function/token_count.indi"
    "function/too_many_tokens.indi"
+   "function/char_per_line.indi"
+   "function/line_over_char_limit.indi"
    "idiom/arithmatic.indi"
    "idiom/collection.indi"
    "idiom/control.indi"
@@ -26,6 +28,10 @@
   (.write w (str "#" (name (:type v)) [(name (:id v)) (activate/activation v)] " "
                  {:* (vec (keys (dissoc v :id :type :main)))})))
 
+(def +default-indicator+
+  {:level :info
+   :accumulate {:default :auto}})
+
 (defn indicator
   "when passed a map, returns an indicator
    (-> (indicator {:id :hello-world
@@ -35,7 +41,7 @@
    => true"
   {:added "0.1"}
   [m]
-  (-> (map->Indicator m)
+  (-> (map->Indicator (nested/merge-nested +default-indicator+ m))
       (assoc :main (atom nil))))
 
 (defn indicator?
@@ -67,14 +73,7 @@
        (filter (fn [f] (.endsWith (str f) ".indi")))
        (load-files)))
 
-
-
-(comment
-
-  (use 'hydrox.core)
-  (def reg (single-use))
-  
-  (defn activate-all [indicators]
+(defn activate-all [indicators]
     (let [indicators (reduce-kv (fn [out k v]
                                   (assoc out k (activate/activate v)))
                                 {}
@@ -90,5 +89,9 @@
                        out)))
                  {}
                  indicators)))
+
+(comment
+  
+  
   
   (activate-all (load-defaults)))

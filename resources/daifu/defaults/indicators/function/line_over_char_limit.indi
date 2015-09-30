@@ -1,0 +1,9 @@
+{:id         :line-over-char-limit
+ :type       :function
+ :doc  "returns all lines in a function that is over the char-limit"
+ :level      :warn
+ :accumulate {:stat :count}
+ :default    {:limit 50}
+ :arglist    [:char-per-line]
+ :source     (fn [counts _ options]
+               (filter #(< (:limit options) %) counts))}

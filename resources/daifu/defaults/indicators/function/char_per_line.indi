@@ -1,0 +1,10 @@
+{:id   :char-per-line
+ :type :function
+ :doc  "returns counts of the number of characters per line"
+ :accumulate {:default :average}
+ :injections [(require '[clojure.string :as string])]
+ :source (fn [zloc]
+            (->> (zip/->string zloc)
+                 (string/split-lines)
+                 (map string/trim)
+                 (map count)))}

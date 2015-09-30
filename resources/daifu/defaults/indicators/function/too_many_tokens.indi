@@ -2,7 +2,8 @@
  :type  :function
  :doc   "returns true if a function has too many tokens"
  :level :warn
- :default    {:limit 40}
- :inputs [:token-count]
- :source (fn [zloc tokens opts]
-            (> tokens (:limit opts)))}
+
+ :default {:limit 40}
+ :arglist [:token-count]
+ :source (fn [tokens _ options]
+            (> tokens (:limit options)))}

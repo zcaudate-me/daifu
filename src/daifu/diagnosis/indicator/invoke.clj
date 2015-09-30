@@ -5,79 +5,83 @@
 
 (declare invoke)
 
-(defn invoke-inputs [global inputs args]
-  (flatten (reduce (fn [out k]
-                     (conj out (invoke global (-> global :indicators k) args)))
-                   []
-                   inputs)))
-
-(defn invoke [global indicator args]
-  (let [main   (-> indicator :main deref)
-        margs  (apply max (args/arg-count main))
-        inputs (invoke-inputs global (:inputs indicator) args)
-        opts?  (if (-> (dec margs) (- (count inputs)) zero?)
-                 []
-                 [(merge (:default indicator) (-> global :current :pair second))])]
-    (apply main (concat args inputs opts?))))
-
-
-(comment
-
-  (require '[daifu.diagnosis.indicator :as indi])
-
-  (def global {:indicators (-> (indi/load-defaults)
-                               (indi/activate-all))})
-
-  (invoke global (-> global :indicators :token-count) [(zip/of-string "(defn add [])")])
-  
-  (invoke global (-> global :indicators :too-many-tokens) [(zip/of-string "(defn add [])")])
-  
-  
-  (invoke (-> global :indicators :too-many-tokens) [(zip/of-string "(defn add [])")]
-          (assoc-in global
-                    [:current :pair] [:too-many-tokens {:limit 40}]))
-
+(defn stat-function
+  "provides the function for merging statistical data
+   
+   ((stat-function {}) [1 2 3 4]) => 10
  
-  
-  (require '[rewrite-clj.zip :as zip]
-           '[clojure.string :as string])
-  
-  
-  (def indi (activate/create-function
-             {:id :char-count
-              :type :function
-              :injections '[(require '[clojure.string :as string])]
-              :source '(fn [zloc]
-                         (->> (zip/->string zloc)
-                              (string/split-lines)
-                              (map string/trim)
-                              (map count)))}))
-  (args/arg-count indi)
-  
-  (def secd (activate/create-function
-             {:id    :char-over
-              :type  :function
-              :level :warn
-              :defaults {:max 30}
-              :inputs [:char-count]
-              :source '(fn [zloc counts opts]
-                         (filter #(< (:max opts) %) counts))}))
+   ((stat-function {:accumulate {:default :count}}) [1 2 3 4])
+   => 4
+ 
+   ((stat-function {:accumulate {:stat :average
+                                 :default :count}}) [1 2 3 4])
+   => 5/2"
+  {:added "0.1"}
+  [{:keys [accumulate] :as indicator}]
+  (let [type (or (:stat accumulate)
+                 (:default accumulate)
+                 :auto)]
+    (case type
+      :auto    result/->stat
+      :average result/average
+      :total   result/total
+      :count   count)))
 
-  (def third (activate/create-function
-              {:id    :lines-over
-               :type  :function
-               :level :warn
-               :inputs [:char-over]
-               :source '(fn [zloc counts]
-                          (count counts))}))
+(defn invoke-arglist
+  "invokes dependents of a particular indicator
+   (invoke-arglist +global+
+                   (-> +global+ :indicators :too-many-tokens)
+                   [:token-count]
+                   (zip/of-string \"(defn add [])\"))
+   => '(4)"
+  {:added "0.1"}
+  ([global indicator arglist input]
+   (invoke-arglist global indicator arglist input nil))
+  ([global indicator arglist input options]
+   (->> arglist
+        (reduce (fn [out k]
+                  (let [sub (-> global :indicators k)]
+                    (cond (= (:type sub) (:type indicator))
+                          (conj out (invoke global sub input options))
 
-  {:indicators {:char-count indi
-                :char-over secd
-                :line-over third}}
+                          :else
+                          (throw (Exception. "NOT YET IMPLEMENTED")))))
+                [])
+        (map :data))))
 
-  (invoke-indicator )
-
-  [[:char-over {:id :default :max 40}]]
-
-  (indi (zip/of-string "(defn add []\n\n(+ 1 2))"))
-  )
+(defn invoke
+  "invokes an indicator with reference to a global datastructure
+   (invoke +global+
+           (-> +global+ :indicators :token-count)
+           (zip/of-string \"(defn add [])\")
+           nil)
+   => (contains {:data 4, :stat 4})
+ 
+   (invoke +global+
+           (-> +global+ :indicators :too-many-tokens)
+           (zip/of-string \"(defn add [])\")
+           nil)
+   => (contains {:data false, :stat 0})
+ 
+   (invoke +global+
+           (-> +global+ :indicators :too-many-tokens)
+           (zip/of-string \"(defn add [])\")
+           {:limit 2})
+   => (contains {:data true, :stat 1})"
+  {:added "0.1"}
+  ([global indicator input]
+   (invoke global indicator input nil))
+  ([global indicator input options]
+   (let [main   (-> indicator :main deref)
+         fargs  (apply max (args/arg-count main))
+         options (merge (:default indicator)
+                        (-> global :current :pair second)
+                        options)
+         args   (invoke-arglist global indicator (:arglist indicator) input options)
+         slots  (- fargs (count args))
+         inputs (case slots
+                  0 []
+                  1 [input]
+                  2 [input options])]
+     (result/result (apply main (concat args inputs))
+                    (stat-function indicator)))))
