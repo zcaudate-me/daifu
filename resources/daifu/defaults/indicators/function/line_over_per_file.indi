@@ -1,0 +1,7 @@
+{:id         :line-over-per-file
+ :type       :file
+
+ :accumulate {:default :average}
+ :arglist    [:line-over-char-limit :line-count]
+ :source     (fn [lines-over lines]
+               (/ (result/total lines-over) lines))}
