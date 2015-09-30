@@ -34,17 +34,25 @@ If part of the code review process can be automated through a tool that can chec
 ```
 "
 
-[[:section {:title "Options"}]]
+[[:section {:title "Running"}]]
 
 "Lets begin by typing `lein daifu` in our project:
-
 
 ```shell
 $ lein daifu
 
+Usage: lein daifu -i qa/indicators -j qa/jurisdictions -f json -o output.json -c qa/checkup.daifu
 
-```
-"
+Options
+  -p, --path PATH               /Users/chris/Development/helpshift/daifu  Path to the repository
+  -c, --checkups-file PATH                                                Path to the checkups file that will be run
+  -f, --format FORMAT           :edn                                      Format of output {edn|json}
+  -i, --indicator-paths DIR                                               Directory to load indicators
+  -j, --jurisdiction-paths DIR                                            Directory to load jurisdictions
+  -o, --output FILE                                                       Path for output file
+      --info                                                              Show this screen
+      --use-git                                                           Load files from git
+```"
 
 
 

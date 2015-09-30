@@ -1,0 +1,8 @@
+{:id    :too-many-tokens
+ :type  :function
+ :doc   "returns true if a function has too many tokens"
+ :level :warn
+ :default    {:limit 40}
+ :inputs [:token-count]
+ :source (fn [zloc tokens opts]
+            (> tokens (:limit opts)))}

@@ -1,6 +1,7 @@
-{:id :no-docstring
- :type :function
- :doc "returns true if the function does not have a docstring"
+{:id     :no-docstring
+ :type   :function
+ :doc    "returns true if the function does not have a docstring"
+ :level  :warn
  :source (fn [zloc]
             (-> (zip/sexpr zloc)
                 (nth 2)
