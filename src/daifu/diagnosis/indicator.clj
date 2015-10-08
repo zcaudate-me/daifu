@@ -1,6 +1,7 @@
 (ns daifu.diagnosis.indicator
   (:require [hara.namespace.eval :as ns]
-            [alembic.still :as still]))
+            [alembic.still :as still]
+            [clojure.pprint :as pprint]))
 
 (defmulti activate-indicator :type)
 
@@ -87,6 +88,11 @@
   (-> (dissoc m :line :column)
       (assoc :row line :col column)))
 
+(defn convert-expressions [{:keys [expr alt] :as m}]
+  (-> m
+      (update-in [:expr] (fn [m] (with-out-str (pprint/pprint m))))
+      (update-in [:alt] (fn [m] (with-out-str (pprint/pprint m))))))
+
 (defmethod activate-indicator
   :idiom
   [indicator]
@@ -94,10 +100,11 @@
                                          [clojure.core.logic.unifier :as unifier]
                                          [kibit.rules.util :as rules]
                                          [kibit.check :as check]
-                                         [daifu.diagnosis.indicator :refer [convert-meta]]]
+                                         [daifu.diagnosis.indicator :refer [convert-meta convert-expressions]]]
                              (fn [indicator]
                                (list 'fn '[reader]
                                      (list '->>
                                            (list 'check/check-reader 'reader
                                                  :rules (compiled-rules indicator))
-                                           (list 'map 'convert-meta))))))
+                                           (list 'map 'convert-meta)
+                                           (list 'map 'convert-expressions))))))

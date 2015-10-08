@@ -3,29 +3,36 @@
             [clojure.java.io :as io]
             [gita.core :as git]
             [cheshire.core :as json]
+            [cheshire.generate :as generate]
             [clojure.pprint :as pprint]
             [daifu.diagnosis :as diagnosis]
             [daifu.diagnosis.indicator :as indicator]
             [daifu.diagnosis.jurisdiction :as jurisdiction]))
 
+(defn accumulate
+  ([m k v]
+   (accumulate m k v []))
+  ([m k v initial]
+   (update-in m [k] (fnil #(conj % v) initial))))
+
 (def cli-options
-  [["-p" "--path PATH" "Path to the repository "
-    :default (System/getProperty "user.dir")]
-   ["-c" "--checkups-file PATH" "Path to the checkups file that will be run"]
-   ["-f" "--format FORMAT" "Format of output {edn|json}"
+  [["-c" "--checkup PATH" "Path to the checkups file that will be run"]
+   ["-f" "--filter PATH"  "Path of files that filter"
+    :assoc-fn #(accumulate %1 %2 %3 #{})]
+   ["-i" "--indicator-path DIR" "Directory to load indicators"
+    :assoc-fn accumulate]
+   ["-j" "--jurisdiction-path DIR" "Directory to load indicators"
+    :assoc-fn accumulate]
+   ["-o" "--output FILE" "Path for output file"]
+   
+   [nil "--format FORMAT" "Format of output {edn|json}"
     :default :edn
     :parse-fn keyword
     :validate [#(#{:edn :json} %) "Must be a either edn or json"]]
-   ["-g"  "--use-git" "Load files from git"
-    :default false]
-   ["-h"  "--help" "Show help screen"]
-   ["-i" "--indicator-paths DIR" "Directory to load indicators"
-    :assoc-fn (fn [m k v] (update-in m [k] (fnil #(conj % v) [])))]
-   ["-j" "--jurisdiction-paths DIR" "Directory to load jurisdictions"
-    :assoc-fn (fn [m k v] (update-in m [k] (fnil #(conj % v) [])))]
-   ["-o" "--output FILE" "Path for output file"]
-   [nil  "--no-defaults" "Do not load default indicators"
-    :default false]])
+   [nil "--no-defaults" "Do not load default indicators"]
+   [nil "--root PATH" "Path to the repository "
+    :default (System/getProperty "user.dir")]
+   [nil "--use-git" "Load files from git"]])
 
 (def ^:dynamic *default-indicators*
   ["file/line_count.indi"
@@ -66,7 +73,7 @@
                  (into {} (-> v
                               (update-in [:indicators] (comp vec sort keys))
                               (update-in [:jurisdictions] (comp vec sort keys))
-                              (dissoc :indicator-paths :jurisdiction-paths))))))
+                              (dissoc :indicator-path :jurisdiction-path))))))
 
 (defn load-maps [dir suffix constructor]
   (->> (file-seq (io/file dir))
@@ -96,20 +103,24 @@
                opts)
         opts (update-in opts [:jurisdictions] merge default-jurisdictions)
         opts (update-in opts [:indicators]
-                        merge (apply merge (map load-indicators (:indicator-paths opts))))
+                        merge (apply merge (map (fn [path]
+                                                  (load-indicators (str (:root opts) "/" path)))
+                                                (:indicator-path opts))))
         opts (update-in opts [:jurisdictions]
-                        merge (apply merge (map load-jurisdictions (:indicator-paths opts))))
+                        merge (apply merge (map (fn [path]
+                                                  (load-jurisdictions (str (:root opts) "/" path)))
+                                                (:jurisdiction-path opts))))
         opts (update-in opts [:checkups]
-                        #(->> (load-checkups (:checkups-file opts))
+                        #(->> (load-checkups (:checkup-path opts))
                               (concat %)
                               vec))
         opts (if (empty? (:checkups opts))
                (assoc opts :checkups (vec (map vector (sort (keys (:indicators opts))))))
                opts)
         opts (assoc-in opts [:repository]
-                       (if (and (git-repo? (:path opts)) (:use-git opts))
-                         (git/repository (:path opts))
-                         (io/file (:path opts))))]
+                       (if (and (git-repo? (:root opts)) (:use-git opts))
+                         (git/repository (:root opts))
+                         (io/file (:root opts))))]
     (map->Visitation opts)))
 
 (defn diagnosis-single [visitation [ik jk]]
@@ -119,22 +130,39 @@
                  (get ik))
         juri (-> visitation
                  :jurisdictions
-                 (get jk))]
+                 (get jk)
+                 (merge (select-keys visitation [:filter])))]
     (if (and indi juri)
       (try
+        (println "Diagnostic for" indi)
         (diagnosis/diagnose (:repository visitation) indi juri)
         (catch Throwable t
           (println "Failure for indicator" indi ", jurisdiction" juri))))))
 
+(defn filter-zero-stats [{:keys [results stat] :as data}]
+    (cond (and (number? stat) (zero? stat)) nil
+
+          (and (number? stat)
+               (vector? results))
+          (update-in data [:results]
+                     #(vec (keep filter-zero-stats %)))
+
+          :else data))
+
 (defn diagnosis [visitation checkups]
-  (let [results (vec (keep (partial diagnosis-single visitation) checkups))
+  (let [path (str (:root visitation) "/" (:output visitation))
+        results (->> checkups
+                     (keep (partial diagnosis-single visitation))
+                     (mapv filter-zero-stats))
         writer  (if (:output visitation)
-                  (io/writer (:output visitation))
+                  (io/writer path)
                   *out*)]
+    
     (case (:format visitation)
-      :json (if (= writer *out*)
-              (.write writer (json/generate-string results {:pretty true}))
-              (spit (:output visitation) (json/generate-string results {:pretty true})))
+      :json (let [output (json/generate-string results {:pretty true})]
+              (if (= writer *out*)
+                (.write writer output)
+                (spit path (str output))))
       :edn  (pprint/pprint results writer))))
 
 (defn -main [& args]
@@ -143,7 +171,7 @@
                   (do (println "Errors on input:")
                       (doseq [error (:errors summary)]
                         (println error))
-                      (assoc summary :help true))
+                      (assoc-in summary [:options :help] true))
                   summary)]
     (cond (-> summary :options :help)
           (println (:summary summary))
@@ -152,3 +180,66 @@
           (let [opts    (:options summary)
                 visit (visitation (dissoc opts :diagnosis))]
             (diagnosis visit (:checkups visit))))))
+
+
+(comment
+  
+  (-> (cli/parse-opts ["--root" "/Users/chris/Development/helpshift/moby" "--no-defaults"
+                       "-i" "qa/indicators" "-o" "output.edn" ]
+                      cli-options)
+      :options)
+  
+  (-main "--help")
+
+  (-main "--root" "/Users/chris/Development/helpshift/moby" "--no-defaults"
+         "-i" "qa/indicators")
+  
+
+  (-main "--root" "/Users/chris/Development/helpshift/moby" "--no-defaults"
+         "-i" "qa/indicators"
+         "-f" "src/qa/automation.clj"
+         "-f" "src/moby/core/models/view_folder.clj"
+         ;;"--format" "json"
+         "-o" "output.edn")
+  
+  (def output (read-string (slurp "output.edn")))
+
+  
+
+  (filter-zero-stats (first output))
+  
+  
+  (filter-zero-stats {:stat 0})
+  => nil
+  
+  (filter-zero-stats {:stat 1
+                      :results [{:path "src/api/lib/handlers/faq.clj", :stat 0, :results []}
+                                {:path "src/api/lib/handlers/issue.clj",
+                                 :stat 1
+                                 :results
+                                 [{:expr '(if hs-tags hs-tags [])
+                                   :alt  '(or hs-tags [])
+                                   :row  155
+                                   :col  7}]}]})
+  {:stat 1, :results [{:path "src/api/lib/handlers/issue.clj",
+                       :stat 1,
+                       :results [{:expr '(if hs-tags hs-tags []),
+                                  :alt  '(or hs-tags []),
+                                  :row  155,
+                                  :col  7}]}]}
+  
+  => {:stat 1
+      :results [{:path "src/api/lib/handlers/issue.clj",
+                 :stat 1
+                 :results
+                 [{:expr '(if hs-tags hs-tags [])
+                   :alt  '(or hs-tags [])
+                   :row  155
+                   :col  7}]}]}
+  
+  
+  (if (zero? (:stat (first output))))
+  
+  
+  
+  )

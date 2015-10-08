@@ -6,8 +6,12 @@
             [jai.query :as query]))
 
 (defn retrieve [repo jurisdiction]
-  (let [paths   (->> (jurisdiction/pick-files repo jurisdiction)
-                     (map (partial hash-map :path)))]
+  (let [paths (jurisdiction/pick-files repo jurisdiction)
+        paths (if-let [checks (:filter jurisdiction)]
+                (filter (fn [path]
+                          (some (fn [check] (.endsWith path check)) checks)) paths)
+                paths)
+        paths (map (partial hash-map :path) paths)]
     (->> paths
          (map (partial jurisdiction/retrieve-file repo))
          (map #(assoc %1 :reader %2) paths)
@@ -83,7 +87,7 @@
                   (try (indicator (:reader f))
                        (catch Throwable t
                          (println "Exception occured using" indicator "on file" (:path f)))))
-        results (doall (keep safe-fn files))]
+        results (vec (keep safe-fn files))]
     (format-results results files)))
 
 (defn diagnose [repo indicator jurisdiction]
@@ -95,6 +99,7 @@
                   :idiom    (diagnose-file repo indicator jurisdiction))
         [results info] (cond (sequential? output)
                              [output nil]
+                             
                              (map? output)
                              [(:results output) (dissoc output :results)])
         stat    (calculate-stat results)]
