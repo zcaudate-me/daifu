@@ -5,6 +5,7 @@
             [cheshire.core :as json]
             [cheshire.generate :as generate]
             [clojure.pprint :as pprint]
+            [daifu.pretty :as pretty]
             [daifu.diagnosis :as diagnosis]
             [daifu.diagnosis.indicator :as indicator]
             [daifu.diagnosis.jurisdiction :as jurisdiction]))
@@ -30,22 +31,25 @@
     :parse-fn keyword
     :validate [#(#{:edn :json} %) "Must be a either edn or json"]]
    [nil "--no-defaults" "Do not load default indicators"]
+   [nil "--pretty" "Pretty print the results"
+    :default (System/getProperty "user.dir")]
    [nil "--root PATH" "Path to the repository "
     :default (System/getProperty "user.dir")]
    [nil "--use-git" "Load files from git"]])
 
 (def ^:dynamic *default-indicators*
-  ["file/line_count.indi"
-   "form/record_count.indi"
-   "function/no_docstring.indi"
-   "function/token_count.indi"
+  [;;"file/line_count.indi"
+   ;;"form/record_count.indi"
+   ;;"function/no_docstring.indi"
+   ;;"function/token_count.indi"
    "idiom/arithmatic.indi"
    "idiom/collection.indi"
    "idiom/control.indi"
    "idiom/equality.indi"
    "idiom/sequence.indi"
    "idiom/string.indi"
-   "project/project_meta.indi"])
+   ;;"project/project_meta.indi"
+   ])
 
 (defn load-default-indicators []
   (->> *default-indicators*
@@ -134,7 +138,7 @@
                  (merge (select-keys visitation [:filter])))]
     (if (and indi juri)
       (try
-        (println "Diagnostic for" indi)
+        (println "Diagnostic started for" (:id indi))
         (diagnosis/diagnose (:repository visitation) indi juri)
         (catch Throwable t
           (println "Failure for indicator" indi ", jurisdiction" juri))))))
@@ -149,21 +153,27 @@
 
           :else data))
 
+
+
 (defn diagnosis [visitation checkups]
   (let [path (str (:root visitation) "/" (:output visitation))
         results (->> checkups
                      (keep (partial diagnosis-single visitation))
-                     (mapv filter-zero-stats))
+                     (keep filter-zero-stats)
+                     vec)
         writer  (if (:output visitation)
                   (io/writer path)
                   *out*)]
-    
-    (case (:format visitation)
-      :json (let [output (json/generate-string results {:pretty true})]
-              (if (= writer *out*)
-                (.write writer output)
-                (spit path (str output))))
-      :edn  (pprint/pprint results writer))))
+    (cond (:pretty visitation)
+          (pretty/display results)
+          
+          :else
+          (case (:format visitation)
+            :json (let [output (json/generate-string results {:pretty true})]
+                    (if (= writer *out*)
+                      (.write writer output)
+                      (spit path (str output))))
+            :edn  (pprint/pprint results writer)))))
 
 (defn -main [& args]
   (let [summary (cli/parse-opts args cli-options)
@@ -202,44 +212,17 @@
          ;;"--format" "json"
          "-o" "output.edn")
   
-  (def output (read-string (slurp "output.edn")))
+  (def output (read-string (slurp "../moby/output.edn")))
 
+
+  output
+  [{:indicator :control,
+    :jurisdisction :default,
+    :stat 2,
+    :results [{:path "src/moby/core/models/view_folder.clj",
+               :stat 1, :results [{:expr "(when (not keep-views?) folder-views)\n",
+                                   :alt "(when-not keep-views? folder-views)\n",
+                                   :row 91, :col 29}]} {:path "src/qa/automation.clj", :stat 1, :results [{:expr "(if\n title\n title\n (let\n  [inc-tags\n   (if (empty? inc-tags) \"<EMPTY>\" (cs/join \" \" inc-tags))\n   exc-tags\n   (if (empty? exc-tags) \"<EMPTY>\" (cs/join \" \" exc-tags))]\n  (format\n   \"Waited days = %s, Platform = %s , App = %s, lang = %s, inc-tags = %s, exc-tags = %s, reply = %s\"\n   waited-days\n   platform-type\n   app-id\n   lang\n   inc-tags\n   exc-tags\n   message)))\n", :alt "(or\n title\n (let\n  [inc-tags\n   (if (empty? inc-tags) \"<EMPTY>\" (cs/join \" \" inc-tags))\n   exc-tags\n   (if (empty? exc-tags) \"<EMPTY>\" (cs/join \" \" exc-tags))]\n  (format\n   \"Waited days = %s, Platform = %s , App = %s, lang = %s, inc-tags = %s, exc-tags = %s, reply = %s\"\n   waited-days\n   platform-type\n   app-id\n   lang\n   inc-tags\n   exc-tags\n   message)))\n", :row 30, :col 3}]}]}]
   
 
-  (filter-zero-stats (first output))
-  
-  
-  (filter-zero-stats {:stat 0})
-  => nil
-  
-  (filter-zero-stats {:stat 1
-                      :results [{:path "src/api/lib/handlers/faq.clj", :stat 0, :results []}
-                                {:path "src/api/lib/handlers/issue.clj",
-                                 :stat 1
-                                 :results
-                                 [{:expr '(if hs-tags hs-tags [])
-                                   :alt  '(or hs-tags [])
-                                   :row  155
-                                   :col  7}]}]})
-  {:stat 1, :results [{:path "src/api/lib/handlers/issue.clj",
-                       :stat 1,
-                       :results [{:expr '(if hs-tags hs-tags []),
-                                  :alt  '(or hs-tags []),
-                                  :row  155,
-                                  :col  7}]}]}
-  
-  => {:stat 1
-      :results [{:path "src/api/lib/handlers/issue.clj",
-                 :stat 1
-                 :results
-                 [{:expr '(if hs-tags hs-tags [])
-                   :alt  '(or hs-tags [])
-                   :row  155
-                   :col  7}]}]}
-  
-  
-  (if (zero? (:stat (first output))))
-  
-  
-  
-  )
+    )
