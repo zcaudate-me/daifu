@@ -16,6 +16,7 @@
 
    --format FORMAT               Format of output {edn|json}
    --no-defaults                 Do not load default indicators
+   --pretty                      Pretty print the results
    --repository PATH             Path to the repository (default to current cwd)
    --use-git                     Load files from git
   "

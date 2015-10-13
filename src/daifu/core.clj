@@ -209,6 +209,7 @@
          "-i" "qa/indicators"
          "-f" "src/qa/automation.clj"
          "-f" "src/moby/core/models/view_folder.clj"
+         "--pretty"
          ;;"--format" "json"
          "-o" "output.edn")
   
@@ -216,13 +217,7 @@
 
 
   output
-  [{:indicator :control,
-    :jurisdisction :default,
-    :stat 2,
-    :results [{:path "src/moby/core/models/view_folder.clj",
-               :stat 1, :results [{:expr "(when (not keep-views?) folder-views)\n",
-                                   :alt "(when-not keep-views? folder-views)\n",
-                                   :row 91, :col 29}]} {:path "src/qa/automation.clj", :stat 1, :results [{:expr "(if\n title\n title\n (let\n  [inc-tags\n   (if (empty? inc-tags) \"<EMPTY>\" (cs/join \" \" inc-tags))\n   exc-tags\n   (if (empty? exc-tags) \"<EMPTY>\" (cs/join \" \" exc-tags))]\n  (format\n   \"Waited days = %s, Platform = %s , App = %s, lang = %s, inc-tags = %s, exc-tags = %s, reply = %s\"\n   waited-days\n   platform-type\n   app-id\n   lang\n   inc-tags\n   exc-tags\n   message)))\n", :alt "(or\n title\n (let\n  [inc-tags\n   (if (empty? inc-tags) \"<EMPTY>\" (cs/join \" \" inc-tags))\n   exc-tags\n   (if (empty? exc-tags) \"<EMPTY>\" (cs/join \" \" exc-tags))]\n  (format\n   \"Waited days = %s, Platform = %s , App = %s, lang = %s, inc-tags = %s, exc-tags = %s, reply = %s\"\n   waited-days\n   platform-type\n   app-id\n   lang\n   inc-tags\n   exc-tags\n   message)))\n", :row 30, :col 3}]}]}]
+  
   
 
     )
